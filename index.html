@@ -23,7 +23,7 @@
 (function(){
   // 路徑放在 # 後面，不會送到伺服器。格式：#筆記草稿/2026-09-11 檔名（不含 .md）
   var raw = decodeURIComponent(location.hash.slice(1));
-  var vault = 'secondbrain';
+  var vault = new URLSearchParams(location.search).get('vault') || 'secondbrain';
   if (!raw) { document.getElementById('title').textContent = '沒有指定筆記路徑'; return; }
   raw = raw.replace(/\.md$/i, '');
   var uri = 'obsidian://open?vault=' + encodeURIComponent(vault) + '&file=' + encodeURIComponent(raw);
