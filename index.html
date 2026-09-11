@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>開啟 Obsidian 筆記</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif;background:#1e1e1e;color:#ddd;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+  .box{text-align:center;max-width:36em;padding:2em}
+  code{background:#333;padding:.2em .5em;border-radius:4px;word-break:break-all}
+  a{color:#8ab4f8}
+  .hint{color:#999;font-size:.9em;margin-top:1.5em}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2 id="title">正在開啟 Obsidian…</h2>
+  <p id="path"></p>
+  <p><a id="link" href="#">沒有自動開啟？點這裡</a></p>
+  <p class="hint">瀏覽器第一次會詢問是否開啟 Obsidian，勾選「一律允許」之後就不會再問。可以關閉此分頁。</p>
+</div>
+<script>
+(function(){
+  // 路徑放在 # 後面，不會送到伺服器。格式：#筆記草稿/2026-09-11 檔名（不含 .md）
+  var raw = decodeURIComponent(location.hash.slice(1));
+  var vault = 'secondbrain';
+  if (!raw) { document.getElementById('title').textContent = '沒有指定筆記路徑'; return; }
+  raw = raw.replace(/\.md$/i, '');
+  var uri = 'obsidian://open?vault=' + encodeURIComponent(vault) + '&file=' + encodeURIComponent(raw);
+  document.getElementById('path').innerHTML = '<code>' + raw.replace(/</g,'&lt;') + '</code>';
+  document.getElementById('link').href = uri;
+  // 用隱藏 iframe 觸發協定，頁面本身不導覽——Chrome 在「導覽進行中」會拒絕 window.close()
+  var f = document.createElement('iframe');
+  f.style.display = 'none';
+  f.src = uri;
+  document.body.appendChild(f);
+  // 這個分頁是外部程式開的、沒有瀏覽歷史，Chromium 允許腳本關閉；給 Obsidian 一點時間接手再關
+  setTimeout(function(){
+    document.getElementById('title').textContent = '已送出開啟請求，正在關閉此分頁…';
+    window.close();
+    setTimeout(function(){
+      try { window.open('', '_self'); window.close(); } catch(e) {}
+      document.getElementById('title').textContent = '已開啟 Obsidian，此分頁可關閉';
+    }, 500);
+  }, 1500);
+})();
+</script>
+</body>
+</html>
