@@ -22,8 +22,10 @@
 <script>
 (function(){
   // 路徑放在 # 後面，不會送到伺服器。格式：#筆記草稿/2026-09-11 檔名（不含 .md）
-  var raw = decodeURIComponent(location.hash.slice(1));
-  var vault = new URLSearchParams(location.search).get('vault') || 'secondbrain';
+  var qs = new URLSearchParams(location.search);
+  // 正式格式是 #路徑；也接受 ?file=路徑（曾誤用過這種寫法，讓它照樣能開）
+  var raw = decodeURIComponent(location.hash.slice(1)) || qs.get('file') || '';
+  var vault = qs.get('vault') || 'secondbrain';
   if (!raw) { document.getElementById('title').textContent = '沒有指定筆記路徑'; return; }
   raw = raw.replace(/\.md$/i, '');
   var uri = 'obsidian://open?vault=' + encodeURIComponent(vault) + '&file=' + encodeURIComponent(raw);
